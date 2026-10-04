@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Candlestick Pattern Flashcards</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--ink:#14213d;--mute:#64748b;--line:#e2e8f0;--up:#16a34a;--dn:#dc2626;--acc:#1d4ed8}
+*,*:before,*:after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:#fff;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+.wrap{max-width:460px;margin:0 auto;padding:16px}
+h1{font-family:Georgia,"Times New Roman",serif;font-size:22px;margin:4px 0 12px;letter-spacing:-.01em}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:8px}.lang{padding:6px 12px;font-size:14px;flex:none}
+.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.tab{flex:1;padding:10px;background:none;border:0;border-bottom:3px solid transparent;font:inherit;font-weight:600;color:var(--mute);cursor:pointer}
+.tab.on{color:var(--acc);border-color:var(--acc)}
+button:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+.scene{perspective:1200px}
+.card{position:relative;width:100%;height:420px;transform-style:preserve-3d;transition:transform .5s;cursor:pointer}
+.card.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;box-shadow:0 6px 20px rgba(20,33,61,.08)}
+.back{transform:rotateY(180deg);overflow-y:auto}
+.front svg{width:100%;height:auto;display:block;margin:auto 0}
+.hint{text-align:center;color:var(--mute);font-size:13px;margin-top:auto}
+.badge{display:inline-block;align-self:flex-start;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+.bull{background:#dcfce7;color:#166534}.bear{background:#fee2e2;color:#991b1b}.neut{background:#e0e7ff;color:#3730a3}
+.back h2{font-family:Georgia,serif;margin:0 0 6px;font-size:22px}
+.back p{margin:0 0 10px;font-size:15px}
+.back b{display:block;font-size:13px;color:var(--mute);margin-bottom:2px}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:8px}
+.btn{padding:10px 16px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font:inherit;font-weight:600;color:var(--ink);cursor:pointer}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.cnt{font-size:14px;color:var(--mute)}
+.qbox{border:1.5px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 6px 20px rgba(20,33,61,.08)}
+.qbox svg{width:100%;height:auto;display:block}
+.q{font-weight:600;margin:6px 4px 10px}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font:inherit;cursor:pointer}
+.opt.ok{background:#dcfce7;border-color:var(--up)}.opt.no{background:#fee2e2;border-color:var(--dn)}
+.fb{margin:12px 4px 0;font-size:14px}
+.score{text-align:center;padding:30px 10px}
+.score .big{font-family:Georgia,serif;font-size:56px;margin:0}
+.bar{height:6px;background:var(--line);border-radius:3px;margin-bottom:12px}.bar i{display:block;height:100%;background:var(--acc);border-radius:3px;transition:width .3s}
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hd"><h1 id="ti">Candlestick patterns</h1><button class="btn lang" id="lg" aria-label="Language"></button></div>
+<div class="tabs"><button class="tab on" id="t1">Flashcards</button><button class="tab" id="t2">Quiz</button></div>
+<div id="app"></div>
+</div>
+<script>
+const D=[[80,82,74,75],[75,77,68,69],[69,71,62,63],[63,65,56,57]];
+const U=[[40,47,39,46],[46,53,45,52],[52,59,51,58],[58,65,57,64]];
+const P=[
+{n:"Hammer",t:"bull",tag:"Bullish reversal",x:"D",h:1,c:[[55,57,43,56.5]],d:"A small body at the top with a long lower shadow, at least twice the body, and little or no upper shadow.",w:"Sellers pushed price sharply lower, but buyers recovered almost all of it before the close. It signals selling pressure is fading.",s:"Appears after a downtrend. Wait for the next candle to close higher to confirm."},
+{n:"Inverted Hammer",t:"bull",tag:"Bullish reversal",x:"D",h:1,c:[[53,66,52,54.5]],d:"A small body at the bottom with a long upper shadow and little or no lower shadow.",w:"Buyers tried to push price up but sellers pulled it back. Even so, buying interest has appeared after a decline.",s:"Appears after a downtrend. Needs a bullish candle after it to confirm."},
+{n:"Hanging Man",t:"bear",tag:"Bearish reversal",x:"U",h:1,c:[[65,66.5,53,64.5]],d:"Looks like a hammer: small body on top, long lower shadow, but it forms at the end of an uptrend.",w:"Sellers drove price down during the session. Buyers recovered, but the sudden selling hints that the rally is weakening.",s:"Appears after an uptrend. Confirm with a lower close on the next candle."},
+{n:"Shooting Star",t:"bear",tag:"Bearish reversal",x:"U",h:1,c:[[65,78,64,66]],d:"A small body at the bottom with a long upper shadow, formed after an uptrend.",w:"Buyers pushed price much higher, but sellers took control and closed it near the open. The rally was rejected.",s:"Appears after an uptrend. A lower candle next strengthens the signal."},
+{n:"Doji",t:"neut",tag:"Indecision",x:"U",h:1,c:[[64,72,56,64.3]],d:"Open and close are almost equal, leaving a tiny body with shadows on both sides.",w:"Buyers and sellers fought to a draw. The prevailing trend has lost momentum and a change may be near.",s:"Weak alone. Read it together with the trend and the candle that follows."},
+{n:"Bullish Engulfing",t:"bull",tag:"Bullish reversal",x:"D",h:2,c:[[55,67,54,66]],d:"A large green candle whose body completely covers the body of the previous red candle.",w:"Buyers overwhelmed sellers in one session. It often marks a bottom.",s:"Appears after a downtrend. Stronger when the green candle is much larger and volume is high."},
+{n:"Bearish Engulfing",t:"bear",tag:"Bearish reversal",x:"U",h:2,c:[[66,67,54,56]],d:"A large red candle whose body completely covers the body of the previous green candle.",w:"Sellers took over decisively. It often marks a top.",s:"Appears after an uptrend. Stronger with high volume on the red candle."},
+{n:"Morning Star",t:"bull",tag:"Bullish reversal",x:"D",h:3,c:[[53,55,49,52],[53,66,52,64]],d:"Three candles: a long red candle, a small-bodied star that gaps down, then a long green candle closing above the first candle's midpoint.",w:"Selling slows to a stop, then buyers take charge. Dawn after a downtrend.",s:"A strong bottoming signal when it appears after an extended decline."},
+{n:"Evening Star",t:"bear",tag:"Bearish reversal",x:"U",h:3,c:[[67,70,66,68],[67,68,56,58]],d:"Three candles: a long green candle, a small star that gaps up, then a long red candle closing below the first candle's midpoint.",w:"Buying momentum stalls, then sellers take charge. Dusk after an uptrend.",s:"A strong topping signal when it appears after an extended rally."},
+{n:"Piercing Line",t:"bull",tag:"Bullish reversal",x:"D",h:2,c:[[54,62,53,60.5]],d:"A red candle followed by a green candle that opens lower and closes above the red candle's midpoint.",w:"Price gapped down, but buyers pushed it back up past the halfway mark. Sentiment is turning.",s:"Appears after a downtrend. Weaker than a bullish engulfing because the red body is not fully covered."},
+{n:"Dark Cloud Cover",t:"bear",tag:"Bearish reversal",x:"U",h:2,c:[[67,68,59,60.5]],d:"A green candle followed by a red candle that opens higher and closes below the green candle's midpoint.",w:"Price gapped up, but sellers drove it back below the halfway mark. The rally is losing strength.",s:"Appears after an uptrend. The deeper the close, the stronger the signal."},
+{n:"Three White Soldiers",t:"bull",tag:"Bullish reversal",x:"D",h:3,c:[[56,64,55,63],[62,70,61,69],[68,76,67,75]],d:"Three consecutive long green candles, each opening within the previous body and closing near its high.",w:"Steady, strong buying over three sessions shows that a new uptrend is taking hold.",s:"Watch for exhaustion if the candles get very long or the shadows grow."},
+{n:"Three Black Crows",t:"bear",tag:"Bearish reversal",x:"U",h:3,c:[[65,66,57,58],[59,60,51,52],[53,54,45,46]],d:"Three consecutive long red candles, each opening within the previous body and closing near its low.",w:"Persistent selling over three sessions shows sellers have taken control after a rally.",s:"Often follows a market top. Be careful if price has already dropped far."},
+{n:"Bullish Harami",t:"bull",tag:"Bullish reversal",x:"D",h:2,c:[[58.5,62,57.5,61]],d:"A large red candle followed by a small green candle whose body sits inside the red candle's body. Harami means pregnant in Japanese.",w:"Downward momentum has stalled. Sellers are no longer in full control.",s:"A mild signal. Wait for confirmation from the next candle."},
+{n:"Bearish Harami",t:"bear",tag:"Bearish reversal",x:"U",h:2,c:[[62.5,63.5,59,60]],d:"A large green candle followed by a small red candle whose body sits inside the green candle's body.",w:"Upward momentum has stalled. Buyers are hesitating.",s:"A mild signal. Wait for confirmation from the next candle."},
+{n:"Bullish Marubozu",t:"bull",tag:"Continuation / strength",x:"D",h:1,c:[[56,69,55.8,68.8]],d:"A long green candle with no shadows, or very tiny ones. Open at the low, close at the high.",w:"Buyers were in complete control from open to close. It shows strong conviction.",s:"Can start a new uptrend or continue one. A bearish Marubozu is the red mirror image."},
+{n:"Bearish Marubozu",t:"bear",tag:"Continuation / weakness",x:"U",h:1,c:[[66,66.2,52,52.2]],d:"A long red candle with no shadows, or very tiny ones. Open at the high, close at the low.",w:"Sellers controlled the whole session, showing strong conviction.",s:"Can start a downtrend or continue one."},
+{n:"Spinning Top",t:"neut",tag:"Indecision",x:"U",h:1,c:[[62,71,55,64]],d:"A small body centered between upper and lower shadows of similar length.",w:"Neither side won. Momentum is fading.",s:"A warning, not a signal. Wait for the next candle."},
+{n:"Dragonfly Doji",t:"bull",tag:"Bullish reversal",x:"D",h:1,c:[[56,56.5,43,56.2]],d:"Open, high and close are nearly equal, with a long lower shadow. It looks like a T.",w:"Sellers pushed price down, but buyers brought it all the way back.",s:"Strongest after a downtrend. Confirm with a higher close."},
+{n:"Gravestone Doji",t:"bear",tag:"Bearish reversal",x:"U",h:1,c:[[65,77,64.8,65.2]],d:"Open, low and close are nearly equal, with a long upper shadow. It looks like an upside-down T.",w:"Buyers pushed price up, but sellers pushed it all the way back.",s:"Strongest after an uptrend. Confirm with a lower close."},
+{n:"Long-Legged Doji",t:"neut",tag:"Indecision",x:"U",h:1,c:[[64,76,52,64.2]],d:"A doji with very long shadows on both sides and the open and close near the middle.",w:"Price swung wildly both ways and ended where it started. The market is torn.",s:"Often shows up near turning points. Wait for confirmation."},
+{n:"Tweezer Bottom",t:"bull",tag:"Bullish reversal",x:"D",h:2,c:[[57.5,64,56,62]],d:"Two candles with matching lows: a red candle, then a green one.",w:"Price tested the same support twice and buyers defended it.",s:"Appears after a downtrend. The matching low acts as a stop-loss reference."},
+{n:"Tweezer Top",t:"bear",tag:"Bearish reversal",x:"U",h:2,c:[[63,65,56,58]],d:"Two candles with matching highs: a green candle, then a red one.",w:"Price hit the same resistance twice and sellers rejected it.",s:"Appears after an uptrend. The matching high acts as a stop-loss reference."},
+{n:"Bullish Kicker",t:"bull",tag:"Bullish reversal",x:"D",h:2,c:[[65,76,64.5,75.5]],d:"A red candle followed by a green candle that gaps up above the red candle's open.",w:"A sudden shift in sentiment, often caused by news. One of the strongest reversal signals.",s:"Rare. Buyers took over instantly and sellers had no chance to recover."},
+{n:"Bearish Kicker",t:"bear",tag:"Bearish reversal",x:"U",h:2,c:[[56,56.5,44,44.5]],d:"A green candle followed by a red candle that gaps down below the green candle's open.",w:"A sudden shift in sentiment, often caused by bad news. Very strong reversal signal.",s:"Rare. Sellers took over instantly."},
+{n:"Three Inside Up",t:"bull",tag:"Bullish reversal",x:"D",h:3,c:[[58.5,62,57.5,61],[61,67,60,66]],d:"A bullish harami followed by a green candle that closes above the first candle's open.",w:"The harami hinted at a bottom and the third candle confirms it.",s:"A confirmed reversal. Buyers can enter after the third candle."},
+{n:"Three Inside Down",t:"bear",tag:"Bearish reversal",x:"U",h:3,c:[[62.5,63.5,59,60],[60,61,53,54]],d:"A bearish harami followed by a red candle that closes below the first candle's open.",w:"The harami hinted at a top and the third candle confirms it.",s:"A confirmed reversal. Sellers can enter after the third candle."},
+{n:"Three Outside Up",t:"bull",tag:"Bullish reversal",x:"D",h:3,c:[[55,67,54,66],[66,73,65,72]],d:"A bullish engulfing pattern followed by another green candle closing higher.",w:"Buyers took over and then showed they could keep going.",s:"More reliable than engulfing alone because the third candle confirms it."},
+{n:"Three Outside Down",t:"bear",tag:"Bearish reversal",x:"U",h:3,c:[[66,67,54,56],[56,57,48,49]],d:"A bearish engulfing pattern followed by another red candle closing lower.",w:"Sellers took over and then showed they could keep going.",s:"More reliable than engulfing alone because the third candle confirms it."},
+{n:"Bullish Abandoned Baby",t:"bull",tag:"Bullish reversal",x:"D",h:3,c:[[52,54,50,52.2],[56,66,55,65]],d:"A red candle, a doji that gaps down with its shadows clear of both neighbors, then a green candle that gaps up.",w:"The doji is an island: selling ended abruptly and buyers returned.",s:"Very rare but powerful bottom signal."},
+{n:"Bearish Abandoned Baby",t:"bear",tag:"Bearish reversal",x:"U",h:3,c:[[69,71,67,69.2],[66,66.5,56,57]],d:"A green candle, a doji that gaps up with its shadows clear of both neighbors, then a red candle that gaps down.",w:"The doji is an island: buying ended abruptly and sellers took over.",s:"Very rare but powerful top signal."},
+{n:"Bullish Three-Line Strike",t:"bull",tag:"Bullish continuation",x:"D",h:4,c:[[56,57,50,51],[51,52,45,46],[46,47,40,41],[39,56,38,55]],d:"Three red candles, then one big green candle that opens below the third close and closes above the first open.",w:"One session erased three sessions of selling. Buyers have taken the lead.",s:"Treat it as a reversal signal. Be careful in strong trends."},
+{n:"Bearish Three-Line Strike",t:"bear",tag:"Bearish continuation",x:"U",h:4,c:[[65,72,64,71],[72,79,71,78],[78,85,77,84],[86,87,68,69]],d:"Three green candles, then one big red candle that opens above the third close and closes below the first open.",w:"One session erased three sessions of buying. Sellers have taken the lead.",s:"Treat it as a reversal signal. Be careful in strong trends."},
+{n:"Rising Three Methods",t:"bull",tag:"Bullish continuation",x:"U",h:5,c:[[64,75,63,74],[73,74,69,70],[70,71,66,67],[67,68,64,65],[65,79,64,78]],d:"A long green candle, three small red candles within its range, then another long green candle closing above the first.",w:"A brief pause in an uptrend. Sellers could not break the first candle's range.",s:"The uptrend is likely to continue. Enter on the final candle."},
+{n:"Falling Three Methods",t:"bear",tag:"Bearish continuation",x:"D",h:5,c:[[56,57,45,46],[47,51,46,50],[50,54,49,53],[53,56,52,55],[55,56,41,42]],d:"A long red candle, three small green candles within its range, then another long red candle closing below the first.",w:"A brief bounce in a downtrend. Buyers could not break the first candle's range.",s:"The downtrend is likely to continue. Enter on the final candle."},
+{n:"Mat Hold",t:"bull",tag:"Bullish continuation",x:"U",h:5,c:[[64,75,63,74],[76,77,72,73],[73,74,70,71],[71,72,69,70],[71,82,70,81]],d:"A long green candle, a gap up, a few small pullback candles, then a long green candle breaking to new highs.",w:"A shallow pause that never threatened the trend. Buyers bought the dip.",s:"Similar to Rising Three Methods, but the gap shows more strength."}
+];
+function chart(p,blank){
+  const cs=[...(p.x==="D"?D:U),...p.c],W=360,H=230,pad=14,n=cs.length;
+  let lo=Math.min(...cs.map(c=>c[2])),hi=Math.max(...cs.map(c=>c[1]));
+  const r=hi-lo;lo-=r*.08;hi+=r*.08;
+  const y=v=>H-pad-(v-lo)/(hi-lo)*(H-2*pad),sl=(W-2*pad)/n,bw=Math.min(sl*.55,34);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${blank?"Candlestick chart":p.n+" candlestick pattern"}">`;
+  for(let i=1;i<5;i++)s+=`<line x1="0" x2="${W}" y1="${H/5*i}" y2="${H/5*i}" stroke="#eef2f7"/>`;
+  const a=n-p.h;
+  s+=`<rect x="${pad+a*sl+2}" y="4" width="${p.h*sl-4}" height="${H-8}" rx="8" fill="#eff6ff" stroke="#93c5fd" stroke-dasharray="4 3"/>`;
+  cs.forEach((c,i)=>{
+    const up=c[3]>=c[0],col=up?"#16a34a":"#dc2626",cx=pad+i*sl+sl/2;
+    const top=y(Math.max(c[0],c[3])),bot=y(Math.min(c[0],c[3])),bh=Math.max(bot-top,2);
+    s+=`<line x1="${cx}" x2="${cx}" y1="${y(c[1])}" y2="${y(c[2])}" stroke="${col}" stroke-width="2"/><rect x="${cx-bw/2}" y="${top}" width="${bw}" height="${bh}" rx="1.5" fill="${col}"/>`;
+  });
+  return s+"</svg>";
+}
+const app=document.getElementById("app"),t1=document.getElementById("t1"),t2=document.getElementById("t2"),lg=document.getElementById("lg");
+const TAGES={"Bullish reversal":"Reversión alcista","Bearish reversal":"Reversión bajista","Indecision":"Indecisión","Continuation / strength":"Continuación / fuerza","Continuation / weakness":"Continuación / debilidad","Bullish continuation":"Continuación alcista","Bearish continuation":"Continuación bajista"};
+const ES=[
+["Martillo","Cuerpo pequeño arriba, sombra inferior larga (al menos el doble del cuerpo) y casi sin sombra superior.","Los vendedores empujaron el precio muy abajo, pero los compradores recuperaron casi todo antes del cierre. La presión vendedora se debilita.","Aparece tras una tendencia bajista. Espera que la siguiente vela cierre al alza para confirmar."],
+["Martillo Invertido","Cuerpo pequeño abajo, sombra superior larga y casi sin sombra inferior.","Los compradores intentaron subir el precio y los vendedores lo devolvieron, pero ya hay interés comprador tras la caída.","Aparece tras una tendencia bajista. Necesita una vela alcista después para confirmar."],
+["Hombre Colgado","Parece un martillo: cuerpo pequeño arriba y sombra inferior larga, pero se forma al final de una tendencia alcista.","Los vendedores hundieron el precio en la sesión. Los compradores lo recuperaron, pero esa venta repentina sugiere que el rally se debilita.","Aparece tras una tendencia alcista. Confirma con un cierre más bajo en la siguiente vela."],
+["Estrella Fugaz","Cuerpo pequeño abajo con sombra superior larga, formada tras una tendencia alcista.","Los compradores empujaron el precio mucho más arriba, pero los vendedores lo devolvieron cerca de la apertura. El alza fue rechazada.","Aparece tras una tendencia alcista. Una vela bajista después refuerza la señal."],
+["Doji","Apertura y cierre casi iguales: cuerpo diminuto con sombras a ambos lados.","Compradores y vendedores empataron. La tendencia pierde impulso y un cambio puede estar cerca.","Débil por sí sola. Léela junto con la tendencia y la vela siguiente."],
+["Envolvente Alcista","Una vela verde grande cuyo cuerpo cubre por completo el cuerpo de la vela roja anterior.","Los compradores superaron a los vendedores en una sola sesión. A menudo marca un suelo.","Aparece tras una tendencia bajista. Es más fuerte si la vela verde es mucho mayor y hay volumen alto."],
+["Envolvente Bajista","Una vela roja grande cuyo cuerpo cubre por completo el cuerpo de la vela verde anterior.","Los vendedores tomaron el control con decisión. A menudo marca un techo.","Aparece tras una tendencia alcista. Es más fuerte con volumen alto en la vela roja."],
+["Estrella de la Mañana","Tres velas: una roja larga, una estrella de cuerpo pequeño con hueco a la baja y una verde larga que cierra sobre el punto medio de la primera.","La venta se frena y luego los compradores toman el mando. Amanece tras una tendencia bajista.","Señal fuerte de suelo tras una caída prolongada."],
+["Estrella de la Tarde","Tres velas: una verde larga, una estrella pequeña con hueco al alza y una roja larga que cierra bajo el punto medio de la primera.","La compra se estanca y luego los vendedores toman el mando. Anochece tras una tendencia alcista.","Señal fuerte de techo tras un rally prolongado."],
+["Línea Penetrante","Una vela roja seguida de una verde que abre más abajo y cierra sobre el punto medio de la roja.","El precio abrió con hueco a la baja, pero los compradores lo llevaron más allá de la mitad. El ánimo está cambiando.","Aparece tras una tendencia bajista. Es más débil que la envolvente porque no cubre todo el cuerpo rojo."],
+["Cubierta de Nube Oscura","Una vela verde seguida de una roja que abre más arriba y cierra bajo el punto medio de la verde.","El precio abrió con hueco al alza, pero los vendedores lo bajaron de la mitad. El rally pierde fuerza.","Aparece tras una tendencia alcista. Cuanto más profundo el cierre, más fuerte la señal."],
+["Tres Soldados Blancos","Tres velas verdes largas seguidas, cada una abre dentro del cuerpo anterior y cierra cerca de su máximo.","Una compra firme durante tres sesiones indica que empieza una nueva tendencia alcista.","Cuidado con el agotamiento si las velas son muy largas o las sombras crecen."],
+["Tres Cuervos Negros","Tres velas rojas largas seguidas, cada una abre dentro del cuerpo anterior y cierra cerca de su mínimo.","Una venta persistente durante tres sesiones muestra que los vendedores controlan tras un rally.","Suele seguir a un techo. Ten cuidado si el precio ya cayó mucho."],
+["Harami Alcista","Una vela roja grande seguida de una verde pequeña dentro del cuerpo de la roja. Harami significa embarazada en japonés.","El impulso bajista se detuvo. Los vendedores ya no dominan por completo.","Señal moderada. Espera confirmación de la siguiente vela."],
+["Harami Bajista","Una vela verde grande seguida de una roja pequeña dentro del cuerpo de la verde.","El impulso alcista se detuvo. Los compradores dudan.","Señal moderada. Espera confirmación de la siguiente vela."],
+["Marubozu Alcista","Una vela verde larga sin sombras, o casi. Abre en el mínimo y cierra en el máximo.","Los compradores controlaron de principio a fin. Muestra gran convicción.","Puede iniciar o continuar una tendencia alcista. El Marubozu bajista es su reflejo en rojo."],
+["Marubozu Bajista","Una vela roja larga sin sombras, o casi. Abre en el máximo y cierra en el mínimo.","Los vendedores controlaron toda la sesión, con gran convicción.","Puede iniciar o continuar una tendencia bajista."],
+["Peonza","Cuerpo pequeño centrado entre sombras superior e inferior de longitud similar.","Ningún bando ganó. El impulso se desvanece.","Es una advertencia, no una señal. Espera la siguiente vela."],
+["Doji Libélula","Apertura, máximo y cierre casi iguales, con sombra inferior larga. Parece una T.","Los vendedores bajaron el precio, pero los compradores lo devolvieron hasta arriba.","Más fuerte tras una tendencia bajista. Confirma con un cierre más alto."],
+["Doji Lápida","Apertura, mínimo y cierre casi iguales, con sombra superior larga. Parece una T invertida.","Los compradores subieron el precio, pero los vendedores lo devolvieron hasta abajo.","Más fuerte tras una tendencia alcista. Confirma con un cierre más bajo."],
+["Doji de Patas Largas","Un doji con sombras muy largas a ambos lados y apertura y cierre cerca del centro.","El precio osciló con fuerza en ambas direcciones y terminó donde empezó. El mercado está dividido.","Suele aparecer cerca de puntos de giro. Espera confirmación."],
+["Pinzas en Mínimos","Dos velas con mínimos iguales: una roja y luego una verde.","El precio probó dos veces el mismo soporte y los compradores lo defendieron.","Aparece tras una tendencia bajista. El mínimo común sirve como referencia para el stop-loss."],
+["Pinzas en Máximos","Dos velas con máximos iguales: una verde y luego una roja.","El precio tocó dos veces la misma resistencia y los vendedores la rechazaron.","Aparece tras una tendencia alcista. El máximo común sirve como referencia para el stop-loss."],
+["Kicker Alcista","Una vela roja seguida de una verde con hueco al alza sobre la apertura de la roja.","Un cambio brusco de sentimiento, a menudo por noticias. Una de las señales de reversión más fuertes.","Es rara. Los compradores tomaron el control al instante."],
+["Kicker Bajista","Una vela verde seguida de una roja con hueco a la baja bajo la apertura de la verde.","Un cambio brusco de sentimiento, a menudo por malas noticias. Señal de reversión muy fuerte.","Es rara. Los vendedores tomaron el control al instante."],
+["Tres Dentro al Alza","Un harami alcista seguido de una vela verde que cierra sobre la apertura de la primera.","El harami sugería un suelo y la tercera vela lo confirma.","Reversión confirmada. Se puede entrar tras la tercera vela."],
+["Tres Dentro a la Baja","Un harami bajista seguido de una vela roja que cierra bajo la apertura de la primera.","El harami sugería un techo y la tercera vela lo confirma.","Reversión confirmada. Se puede entrar tras la tercera vela."],
+["Tres Fuera al Alza","Una envolvente alcista seguida de otra vela verde que cierra más alto.","Los compradores tomaron el control y demostraron que pueden continuar.","Más fiable que la envolvente sola, porque la tercera vela la confirma."],
+["Tres Fuera a la Baja","Una envolvente bajista seguida de otra vela roja que cierra más bajo.","Los vendedores tomaron el control y demostraron que pueden continuar.","Más fiable que la envolvente sola, porque la tercera vela la confirma."],
+["Bebé Abandonado Alcista","Una vela roja, un doji con hueco a la baja cuyas sombras no tocan a las vecinas y una vela verde con hueco al alza.","El doji es una isla: la venta terminó de golpe y volvieron los compradores.","Señal de suelo muy rara pero poderosa."],
+["Bebé Abandonado Bajista","Una vela verde, un doji con hueco al alza cuyas sombras no tocan a las vecinas y una vela roja con hueco a la baja.","El doji es una isla: la compra terminó de golpe y los vendedores tomaron el control.","Señal de techo muy rara pero poderosa."],
+["Golpe de Tres Líneas Alcista","Tres velas rojas y luego una verde grande que abre bajo el cierre de la tercera y cierra sobre la apertura de la primera.","Una sesión borró tres sesiones de venta. Los compradores toman la delantera.","Trátala como señal de reversión. Cuidado en tendencias fuertes."],
+["Golpe de Tres Líneas Bajista","Tres velas verdes y luego una roja grande que abre sobre el cierre de la tercera y cierra bajo la apertura de la primera.","Una sesión borró tres sesiones de compra. Los vendedores toman la delantera.","Trátala como señal de reversión. Cuidado en tendencias fuertes."],
+["Tres Métodos Alcistas","Una vela verde larga, tres velas rojas pequeñas dentro de su rango y otra verde larga que cierra sobre la primera.","Una breve pausa en una tendencia alcista. Los vendedores no rompieron el rango de la primera vela.","Es probable que la tendencia alcista continúe. Entra en la última vela."],
+["Tres Métodos Bajistas","Una vela roja larga, tres velas verdes pequeñas dentro de su rango y otra roja larga que cierra bajo la primera.","Un breve rebote en una tendencia bajista. Los compradores no rompieron el rango de la primera vela.","Es probable que la tendencia bajista continúe. Entra en la última vela."],
+["Mat Hold","Una vela verde larga, un hueco al alza, algunas velas pequeñas de retroceso y otra verde larga que rompe a nuevos máximos.","Una pausa superficial que nunca amenazó la tendencia. Los compradores aprovecharon la caída.","Similar a Tres Métodos Alcistas, pero el hueco muestra más fuerza."]
+];
+P.forEach((p,k)=>p.es=ES[k]);
+const T={en:{ti:"Candlestick patterns",t1:"Flashcards",t2:"Quiz",hint:"Which pattern is this? Tap to flip",pv:"Back",nx:"Next",of:"of",shf:"Shuffle",all:"All patterns",a:"What it looks like",b:"What it means",c:"How to trade it",q:"Question",qn:"name this pattern",ok:"Correct.",no:"Not quite. It's the",nq:"Next question",sc:"See score",s1:"Excellent. You read candles well.",s2:"Good progress. Review the missed ones in Flashcards.",s3:"Keep practicing with the flashcards, then try again.",ag:"Try again",lg:"Español"},
+es:{ti:"Patrones de velas japonesas",t1:"Tarjetas",t2:"Cuestionario",hint:"¿Qué patrón es? Toca para voltear",pv:"Anterior",nx:"Siguiente",of:"de",shf:"Mezclar",all:"Todos los patrones",a:"Cómo se ve",b:"Qué significa",c:"Cómo operarlo",q:"Pregunta",qn:"¿cómo se llama este patrón?",ok:"¡Correcto!",no:"Casi. Es",nq:"Siguiente pregunta",sc:"Ver puntaje",s1:"Excelente. Lees muy bien las velas.",s2:"Buen avance. Repasa las falladas en Tarjetas.",s3:"Sigue practicando con las tarjetas e inténtalo otra vez.",ag:"Intentar de nuevo",lg:"English"}};
+let L="en",cur=1;
+const tr=k=>T[L][k],cn=k=>L==="es"?k+(k>1?" velas":" vela"):k+(k>1?" candles":" candle");
+const g=p=>L==="es"?Object.assign({},p,{n:p.es[0],tag:TAGES[p.tag],d:p.es[1],w:p.es[2],s:p.es[3]}):p;
+function applyLang(){document.documentElement.lang=L;document.title=tr("ti");document.getElementById("ti").textContent=tr("ti");t1.textContent=tr("t1");t2.textContent=tr("t2");lg.textContent=tr("lg")}
+lg.onclick=()=>{L=L==="en"?"es":"en";applyLang();cur==1?cards():ask()};
+
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let deck=P.slice(),i=0,flt=0;
+function tab(k){cur=k;if(k==1){deck=P.filter(x=>!flt||x.h==flt);i=0}t1.classList.toggle("on",k==1);t2.classList.toggle("on",k==2);k==1?cards():startQuiz()}
+t1.onclick=()=>tab(1);t2.onclick=()=>tab(2);
+function cards(){
+  const p=g(deck[i]);
+  app.innerHTML=`<div class="scene"><div class="card" id="cd" tabindex="0" role="button" aria-label="Flip card">
+  <div class="face front">${chart(p,true)}<div class="hint">${tr("hint")}</div></div>
+  <div class="face back"><span class="badge ${p.t}">${p.tag} · ${cn(p.h)}</span><h2>${p.n}</h2>
+  <b>${tr("a")}</b><p>${p.d}</p><b>${tr("b")}</b><p>${p.w}</p><b>${tr("c")}</b><p>${p.s}</p></div></div></div>
+  <div class="nav"><button class="btn" id="pv">${tr("pv")}</button><span class="cnt">${i+1} ${tr("of")} ${deck.length}</span><button class="btn pri" id="nx">${tr("nx")}</button></div>
+  <div class="nav"><select class="btn" id="fl" aria-label="Filter by candles"><option value="0">${tr("all")}</option>${[1,2,3,4,5].map(k=>`<option value="${k}" ${flt==k?"selected":""}>${cn(k)}</option>`).join("")}</select><button class="btn" id="shf">${tr("shf")}</button></div>`;
+  const cd=document.getElementById("cd"),f=()=>cd.classList.toggle("flip");
+  cd.onclick=f;cd.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f()}};
+  document.getElementById("pv").onclick=()=>{i=(i-1+deck.length)%deck.length;cards()};
+  document.getElementById("nx").onclick=()=>{i=(i+1)%deck.length;cards()};
+  document.getElementById("shf").onclick=()=>{deck=sh(deck);i=0;cards()};
+  document.getElementById("fl").onchange=e=>{flt=+e.target.value;deck=P.filter(x=>!flt||x.h==flt);i=0;cards()};
+}
+let qs,qi,sc,done;
+function startQuiz(){qs=sh(P).slice(0,10);qi=0;sc=0;ask()}
+function ask(){
+  if(qi>=qs.length){
+    app.innerHTML=`<div class="score"><p class="big">${sc}/${qs.length}</p><p>${tr(sc>=8?"s1":sc>=5?"s2":"s3")}</p><button class="btn pri" id="ag">${tr("ag")}</button></div>`;
+    document.getElementById("ag").onclick=startQuiz;return;
+  }
+  done=false;const p=qs[qi];
+  const o=sh([p,...sh(P.filter(x=>x!==p)).slice(0,3)]);
+  app.innerHTML=`<div class="bar"><i style="width:${qi/qs.length*100}%"></i></div>
+  <div class="qbox">${chart(p,true)}<div class="q">${tr("q")} ${qi+1} ${tr("of")} ${qs.length}: ${tr("qn")}</div><div class="opts" id="os">${o.map((x,k)=>`<button class="opt" data-k="${k}">${g(x).n}</button>`).join("")}</div><div class="fb" id="fb"></div></div>`;
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    if(done)return;done=true;const x=o[b.dataset.k],good=x===p;if(good)sc++;
+    document.querySelectorAll(".opt").forEach((e,k)=>{if(o[k]===p)e.classList.add("ok")});
+    if(!good)b.classList.add("no");
+    document.getElementById("fb").innerHTML=`<p><b>${good?tr("ok"):tr("no")+" "+g(p).n+"."}</b> ${g(p).d}</p><button class="btn pri" id="nq">${qi+1<qs.length?tr("nq"):tr("sc")}</button>`;
+    document.getElementById("nq").onclick=()=>{qi++;ask()};
+  });
+}
+applyLang();cards();
+</script>
+</body>
+</html>
